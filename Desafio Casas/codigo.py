@@ -1,15 +1,15 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-
+from sklearn.preprocessing import Imputer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 from pathlib import Path
 import sys
-
 sys._enablelegacywindowsfsencoding()
+
 #função erro absoluto medio
-def get_mae(max_leaf_nodes, predictors_train, predictors_val, targ_train, targ_val):
+def get_mae(predictors_train, predictors_val, targ_train, targ_val):
     forest_model = RandomForestRegressor(random_state=1)
     forest_model.fit(predictors_train, targ_train)
     preds_val = forest_model.predict(predictors_val)
@@ -21,23 +21,25 @@ test_file_path = Path('C:/Users/Bancada/Documents/Gustavo/Programação/Desafio 
 train = pd.read_csv(train_file_path)#le o arquivo de treino
 test = pd.read_csv(test_file_path)#le o arquivo de treino
 
-predictors = ['LotArea','YearBuilt','1stFlrSF','2ndFlrSF','FullBath','BedroomAbvGr','TotRmsAbvGrd', 'YearRemodAdd', 'TotalBsmtSF']
 y = train.SalePrice
-X = train[predictors]
+predictors = train.drop(['SalePrice'], axis=1)
+X = predictors.select_dtypes(exclude=['object'])
+#X = train[numeric_predictors]
+
 #test_y = test.SalePrice
 #test_x = test[predictors]
 
-train_X, val_X, train_y, val_y = train_test_split(X, y)
-best_one = 99999999
-for i in range(5,100,2):
-    max_leaf_nodes = i
-    my_mae = get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y)
-    #print("Max leaf nodes: %d  \t\t Mean Absolute Error:  %d" %(max_leaf_nodes, my_mae))
-    if my_mae < best_one:
-        best_one = my_mae
-        folhas = max_leaf_nodes
+train_X, val_X, train_y, val_y = train_test_split(X, y, train_size=0.8, test_size=0.2, random_state=0)
+my_imputer = Imputer()
+imputed_X_train = my_imputer.fit_transform(train_X)
+imputed_X_test = my_imputer.transform(val_X)
+
+
+my_mae = get_mae(imputed_X_train, imputed_X_test, train_y, val_y)
+print(my_mae)
+
     
-print(best_one)
+
 
 # Run this code block with the control-enter keys on your keyboard. Or click the blue botton on the left
 #print()
