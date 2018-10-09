@@ -1,0 +1,80 @@
+```{r}
+M <- 100000 #Numero de iterações
+Vs <- c(2.0361,6.0881,10.0229,14.048,19.035)#Medidas do Padrao
+faixa_Vs <- 100 #Escala de 100v do Multimetro padrao
+delta_Vs <- matrix(c(1:5*M), nrow=M, ncol=5, byrow = TRUE)#Incerteza do Padrao
+for(i in 1:5)#Calculo da Incerteza do Padrao
+{
+  delta_Vs[,i] <- rnorm(M, 0, 0.0045*Vs[i]/100 + 0.0006*faixa_Vs/100) #±( % of reading + % of range )  
+  #print(delta_Vs[i])
+}
+
+Medidas_sd <-c(1:5)#Desvio padrao das medidas
+Medidas_mean<-c(1:5)#Valor medio das medidas
+Medidas = matrix(c(2.02, 2.01, 2.01,2.00,2.01,
+     6.07, 6.07,6.07, 6.07,6.06,
+     10.00, 10.00, 9.99, 9.99, 10.00,
+      14.02, 14.01, 14.00, 14.00, 14.01,
+      18.99, 18.99, 19.00, 18.99, 18.99), 
+   nrow=5, ncol=5, byrow = TRUE) 
+for(i in 1:5)
+{
+  Medidas_sd[i] <- sd(Medidas[i,])
+  Medidas_mean[i] <- mean(Medidas[i,])
+ # print(Medidas_sd[i])
+}
+
+#Declarando Ex e Vi
+x <- seq(-10, 10, length=M*5) #Intervalo eixo x
+Vi <- matrix(c(1:5*M), nrow=M, ncol=5, byrow = TRUE)
+teste <- matrix(c(1:5*M), nrow=M, ncol=5, byrow = TRUE)
+Ex <- matrix(c(1:5*M), nrow=M, ncol=5, byrow = TRUE)
+delta_Vi <- matrix(c(1:5*M), nrow=M, ncol=5, byrow = TRUE)
+
+for(i in 1:5)
+{
+  delta_Vi[,i] <- runif(n=M, min=-0.005, max=0.005)
+}
+
+for(i in 1:5)
+{
+  Vi[,i] <-rnorm(M,Medidas_mean[i],Medidas_sd[i])
+  #Vi[,i] <- rt(M, 4, ncp = Medidas_mean[i])
+}
+
+for(i in 1:5)
+{
+  for(j in 1:M)
+  {
+    Ex[j,i] <- Vi[j,i] + delta_Vi[j,i] - Vs[i] - delta_Vs[j,i]
+  }
+}
+Ex_media <- c(1:5)
+print("Os erros das medidas Ex são respectivamente")
+for(i in 1:5)
+{
+  Ex_media[i] <- mean(Ex[,i])
+  print(Ex_media[i])
+}
+# for(i in 1:5)
+# {
+#   Ex[,i] <- sort(Ex[,i])
+# }
+
+#Ex <- sort(Vi)
+
+#r <- M*(1-0.95) 
+
+#print(sd(E))
+  plot(density(Ex))
+#plot(x, Ex, type="l", xlab="IQ Values", ylab="", main="Normal Distribution")
+
+```
+
+
+
+
+
+
+
+
